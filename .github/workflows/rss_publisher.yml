@@ -1,0 +1,41 @@
+name: Boannews RSS to Hiworks Board via Email Filter
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  run-rss-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run RSS Mailer Script
+        env:
+          HIWORKS_SMTP_USER: ${{ secrets.HIWORKS_SMTP_USER }}
+          HIWORKS_SMTP_PASS: ${{ secrets.HIWORKS_SMTP_PASS }}
+          TARGET_EMAIL: ${{ secrets.TARGET_EMAIL }}
+        run: python src/main.py
+
+      - name: Commit & Push History Update
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add published_history.txt
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Chore: Update RSS history" && git push)
