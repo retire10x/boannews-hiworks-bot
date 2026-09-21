@@ -9,12 +9,39 @@ from pathlib import Path
 
 import feedparser
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+ENV_FILE = PROJECT_ROOT / ".env"
+
+
+def load_env_file(path: Path) -> None:
+    """`.env`를 읽어 os.environ에 넣습니다 (dotenv 미설치 시에도 동작)."""
+    if not path.is_file():
+        return
+    text = path.read_text(encoding="utf-8-sig")
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        if not key:
+            continue
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+            value = value[1:-1]
+        os.environ[key] = value
+
+
 try:
     from dotenv import load_dotenv
 
-    load_dotenv(Path(__file__).resolve().parent.parent / ".env", override=True)
+    load_dotenv(ENV_FILE, override=True)
 except ImportError:
     pass
+
+load_env_file(ENV_FILE)
 
 HIWORKS_SMTP_USER = (os.getenv("HIWORKS_SMTP_USER") or "").strip()
 HIWORKS_SMTP_PASS = (os.getenv("HIWORKS_SMTP_PASS") or "").strip()
@@ -110,12 +137,24 @@ def send_digest_email(entries):
 
 
 def validate_env():
-    if not all([HIWORKS_SMTP_USER, HIWORKS_SMTP_PASS, TARGET_EMAIL]):
-        print(
-            "오류: HIWORKS_SMTP_USER, HIWORKS_SMTP_PASS, TARGET_EMAIL 이 비어 있습니다. "
-            "GitHub Repository Secrets 이름이 정확히 일치하는지 확인하세요."
-        )
-        sys.exit(1)
+    fields = {
+        "HIWORKS_SMTP_USER": HIWORKS_SMTP_USER,
+        "HIWORKS_SMTP_PASS": HIWORKS_SMTP_PASS,
+        "TARGET_EMAIL": TARGET_EMAIL,
+    }
+    missing = [name for name, val in fields.items() if not val]
+    if not missing:
+        return
+
+    print("오류: 다음 환경 변수가 비어 있습니다:", ", ".join(missing))
+    print(f"  .env 경로: {ENV_FILE}")
+    print(f"  .env 파일 존재: {ENV_FILE.is_file()}")
+    if ENV_FILE.is_file():
+        print("  → .env 저장(Ctrl+S) 및 HIWORKS_SMTP_PASS(메일 전용 비밀번호) 확인")
+    else:
+        print("  → .env.example 을 복사해 .env 생성 후 값 입력")
+    print("  (GitHub 와 무관. 이 폴더의 .env 만 사용합니다.)")
+    sys.exit(1)
 
 
 def process_rss():

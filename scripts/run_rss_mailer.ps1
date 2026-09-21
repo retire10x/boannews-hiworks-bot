@@ -8,5 +8,10 @@ if (-not (Test-Path $Python)) {
     Write-Error ".venv 없음. 먼저: python -m venv .venv; .\.venv\Scripts\pip install -r requirements.txt"
 }
 
+$EnvFile = Join-Path $ProjectRoot ".env"
+if (-not (Test-Path $EnvFile)) {
+    Write-Error ".env 없음: $EnvFile (.env.example 을 복사해 값을 입력하세요)"
+}
+
 $env:PYTHONIOENCODING = "utf-8"
 & $Python (Join-Path $ProjectRoot "src\main.py")
