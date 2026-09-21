@@ -31,18 +31,30 @@ python src/main.py
 | Secret | 설명 |
 |--------|------|
 | `HIWORKS_SMTP_USER` | 발신 하이웍스 메일 |
-| `HIWORKS_SMTP_PASS` | 비밀번호 또는 **앱 비밀번호** (OTP 사용 시 필수) |
+| `HIWORKS_SMTP_PASS` | **메일 전용 비밀번호** (OTP 사용 시 로그인 비밀번호 불가) |
 | `TARGET_EMAIL` | 규칙이 걸린 수신 메일 주소 |
 
 다른 이름(예: `HIWORKSCTRL`)으로 넣으면 워크플로에서 읽지 못합니다.
 
-앱 비밀번호: 하이웍스 오피스 → 프로필 → 보안 설정 → 앱 비밀번호 생성
+메일 전용 비밀번호: 웹메일 **메일 프로그램 환경 설정 안내** 또는 **내 정보 → 설정 → 보안 설정**
 
-## SMTP
+## SMTP (하이웍스 공식 연동 값)
 
-- 호스트: `smtps.hiworks.com`
-- 포트: `465` (SSL)
+| 항목 | 값 |
+|------|-----|
+| 아이디 | 전체 주소 → `HIWORKS_SMTP_USER` |
+| 비밀번호 | 메일 전용 비밀번호 → `HIWORKS_SMTP_PASS` |
+| SMTP | `smtps.hiworks.com` / **465** / SSL |
 
-## 수동 워크플로 실행
+POP3/SMTP: **환경설정 → 기본 설정 → 사용 함** 필수.
+
+## Windows 작업 스케줄러 (운영 권장)
+
+GitHub Actions는 하이웍스 **허용 국가(대한민국)** 와 맞지 않을 수 있습니다.  
+**매일 같은 시각 1회** 실행은 작업 스케줄러 + `scripts/run_rss_mailer.ps1` 을 사용하세요.
+
+단계별 가이드: [docs/windows-task-scheduler.md](docs/windows-task-scheduler.md)
+
+## 수동 워크플로 실행 (GitHub, 선택)
 
 GitHub → Actions → **Boannews RSS to Hiworks Board via Email Filter** → **Run workflow**
