@@ -1,5 +1,6 @@
 import os
 import smtplib
+import sys
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -58,14 +59,27 @@ def send_rss_email(title, link, description, pub_date):
         server.sendmail(HIWORKS_SMTP_USER, [TARGET_EMAIL], msg.as_string())
 
 
+def validate_env():
+    if not all([HIWORKS_SMTP_USER, HIWORKS_SMTP_PASS, TARGET_EMAIL]):
+        print(
+            "오류: HIWORKS_SMTP_USER, HIWORKS_SMTP_PASS, TARGET_EMAIL 이 비어 있습니다. "
+            "GitHub Repository Secrets 이름이 정확히 일치하는지 확인하세요."
+        )
+        sys.exit(1)
+
+
 def process_rss():
+    validate_env()
+
     feed = feedparser.parse(RSS_URL)
     if feed.bozo and not feed.entries:
         print(f"RSS 파싱 오류: {feed.bozo_exception}")
-        return
+        sys.exit(1)
 
     history = load_history()
     new_history = set(history)
+    sent = 0
+    failed = 0
 
     for entry in reversed(feed.entries):
         article_id = entry.get("link") or entry.get("title")
@@ -81,10 +95,15 @@ def process_rss():
             send_rss_email(title, link, description, pub_date)
             print(f"발송 완료: {title}")
             new_history.add(article_id)
+            sent += 1
         except Exception as e:
             print(f"발송 실패 ({title}): {e}")
+            failed += 1
 
     save_history(new_history)
+
+    if failed and sent == 0:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

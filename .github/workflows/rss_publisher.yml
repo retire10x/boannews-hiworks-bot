@@ -38,4 +38,10 @@ jobs:
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add published_history.txt
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Chore: Update RSS history" && git push)
+          if git diff --staged --quiet; then
+            echo "No history changes to commit."
+            exit 0
+          fi
+          git commit -m "Chore: Update RSS history"
+          git pull --rebase origin main
+          git push

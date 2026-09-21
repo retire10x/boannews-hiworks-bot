@@ -26,11 +26,15 @@ python src/main.py
 
 ## GitHub Secrets
 
+**Repository secrets**에 아래 **이름 그대로** 3개를 등록해야 합니다 (`.env`와 별개).
+
 | Secret | 설명 |
 |--------|------|
 | `HIWORKS_SMTP_USER` | 발신 하이웍스 메일 |
 | `HIWORKS_SMTP_PASS` | 비밀번호 또는 **앱 비밀번호** (OTP 사용 시 필수) |
 | `TARGET_EMAIL` | 규칙이 걸린 수신 메일 주소 |
+
+다른 이름(예: `HIWORKSCTRL`)으로 넣으면 워크플로에서 읽지 못합니다.
 
 앱 비밀번호: 하이웍스 오피스 → 프로필 → 보안 설정 → 앱 비밀번호 생성
 
