@@ -55,6 +55,12 @@ GitHub Actions는 하이웍스 **허용 국가(대한민국)** 와 맞지 않을
 
 단계별 가이드: [docs/windows-task-scheduler.md](docs/windows-task-scheduler.md)
 
+## PC: 메일 수신 후 게시판 등록
+
+서버에서 digest 발송 → **PC**에서 POP3 + Playwright(로그인 세션)로 게시판에 등록.
+
+[docs/pc-board-poster.md](docs/pc-board-poster.md)
+
 ## 수동 워크플로 실행 (GitHub, 선택)
 
 GitHub → Actions → **Boannews RSS to Hiworks Board via Email Filter** → **Run workflow**

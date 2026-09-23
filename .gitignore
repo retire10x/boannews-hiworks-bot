@@ -9,3 +9,7 @@ dist/
 build/
 .idea/
 .vscode/
+.hiworks_browser_profile/
+board_posted_uids.txt
+logs/*
+!logs/README.md

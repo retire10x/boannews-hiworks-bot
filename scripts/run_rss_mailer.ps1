@@ -1,5 +1,6 @@
 # Windows 작업 스케줄러에서 호출용
 $ErrorActionPreference = "Stop"
+. (Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "ensure_utf8.ps1")
 $ProjectRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 Set-Location $ProjectRoot
 
@@ -13,5 +14,4 @@ if (-not (Test-Path $EnvFile)) {
     Write-Error ".env 없음: $EnvFile (.env.example 을 복사해 값을 입력하세요)"
 }
 
-$env:PYTHONIOENCODING = "utf-8"
-& $Python (Join-Path $ProjectRoot "src\main.py")
+& $Python -u (Join-Path $ProjectRoot "src\main.py")
